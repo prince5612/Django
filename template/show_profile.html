@@ -1,0 +1,98 @@
+{%extends 'base.html'%}
+{% block title %} Profile {% endblock title %}
+{% block style %}
+<style>
+    .profile-head {
+        transform: translateY(5rem)
+    }
+
+    .cover {
+        background-image: url(https://images.unsplash.com/photo-1530305408560-82d13781b33a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1352&q=80);
+        background-size: cover;
+        background-repeat: no-repeat
+    }
+
+    body {
+        /* background: #654ea3; */
+        /* background: linear-gradient(to right, #e96443, #904e95); */
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+</style>
+{% endblock style %}
+
+{% block body %}
+<div class="row py-5 px-4">
+    <div class="col-md-5 mx-auto" style="width: 70vw;"> <!-- Profile widget -->
+        <div class="bg-white shadow rounded overflow-hidden">
+            <div class="px-4 pt-0 pb-5 cover">
+                
+                <div class="media align-items-end profile-head">
+                    <div class="profile mr-3">
+                        {% if img.dp %}
+                        <img src="{{ img.dp.url }}" alt="helllooo"  width="130" class="rounded mb-2 img-thumbnail">
+                        {% else %}
+                        <img src="media/temp/user.png" alt="helllooo" width="130" class="rounded mb-2 img-thumbnail">
+                        {% endif %}
+
+                    </div>
+                    <div class="media-body mb-5 text-white">
+                        <h4 class="mt-0 mb-0">{{info.name}} {{info.surname}}</h4>
+                        <!-- <p class="small mb-4"><i class="fas fa-map-marker-alt mr-2"></i>New York</p> -->
+                        <div>
+                            <a href="logout" class="btn btn-outline-dark btn-sm btn-block" style="color: white; border-color: white;  margin-left: 900px;">Log out</a>
+                        </div>
+                    </div>
+                  
+                </div>
+                
+            </div>
+            
+            <div class="bg-light p-4 d-flex justify-content-end text-center">
+
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                        <h5 class="font-weight-bold mb-0 d-block">{{cnt.post_cnt}}</h5><small class="text-muted"> <i
+                                class="fas fa-image mr-1"></i>Photos</small>
+                    </li>
+                    <a href="followers_list" style="text-decoration: none; color: black;"><li class="list-inline-item">
+                        <h5 class="font-weight-bold mb-0 d-block">{{cnt.follower_cnt}}</h5><small class="text-muted"> <i
+                                class="fas fa-user mr-1"></i>Followers</small>
+                    </li></a>
+                    <a href="following_list" style="text-decoration: none; color: black;"><li class="list-inline-item">
+                        <h5 class="font-weight-bold mb-0 d-block">{{cnt.following_cnt}}</h5><small class="text-muted"> <i
+                                class="fas fa-user mr-1"></i>Following</small>
+                    </li></a>
+                </ul>
+            </div>
+            <div class="px-4 py-3">
+                <a href="edit_profile" class="btn btn-outline-dark btn-sm btn-block">Edit profile</a>
+                <a href="post_create" class="btn btn-outline-dark btn-sm btn-block" style="margin-left: 800px;">Upload
+                    Post</a>
+                <!-- <h5 class="mb-0">About</h5>
+                <div class="p-4 rounded shadow-sm bg-light">
+                    <p class="font-italic mb-0">Web Developer</p>
+                    <p class="font-italic mb-0">Lives in New York</p>
+                    <p class="font-italic mb-0">Photographer</p>
+                </div> -->
+            </div>
+            <div class="py-4 px-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="mb-0">Uploaded Posts</h5><a href="#" class="btn btn-link text-muted"></a>
+                </div>
+                <div class="row">
+                    {% for post in posts %}
+                    <div class="col-lg-6 mb-2 pr-lg-1">
+                        <a href="show_post?post={{ post.id }}"><img
+                            src="{{ post.post_img.url }}"
+                            alt="" class="img-fluid rounded shadow-sm" style="width: 750px; height: 400px;"></a></div>
+                            <!-- <div class="col-lg-6 mb-2 pl-lg-1"><img
+                                src="https://images.unsplash.com/photo-1493571716545-b559a19edd14?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80"
+                                alt="" class="img-fluid rounded shadow-sm"></div> -->
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

@@ -1,0 +1,112 @@
+{%extends 'base.html'%}
+{% block title %} Friend Request {% endblock title %}
+{% block style %}
+
+<style>
+    #fb {
+        width: 500px;
+        border: 1px solid gray;
+        border-radius: 5px;
+        position: relative;
+        height: 175px;
+    }
+
+    #fb p {
+        font-family: sans-serif;
+        margin: 0 0 0 10px;
+        line-height: 30px;
+    }
+
+    #fb-top span {
+        color: #4267B2;
+        float: right;
+        margin-right: 10px;
+    }
+
+    #fb-top {
+        background-color: #efefef;
+        height: 30px;
+        width: 500px;
+        border-radius: 5px 5px 0 0;
+        position: absolute;
+        top: -1px;
+        left: -1px;
+        border: 1px solid gray;
+    }
+
+    #fb img {
+        position: absolute;
+        left: 10px;
+        top: 52.5px;
+    }
+
+    #button-block {
+        margin-left: 525px;
+        margin-top: -50px; 
+    }
+
+    #button-block div {
+        display: inline-block;
+    }
+
+    #confirm,
+    #delete {
+        background-color: #4267B2;
+        color: white;
+        padding: 7px;
+        border-radius: 2px;
+        margin-right: 10px;
+        font-family: sans-serif;
+    }
+
+    #delete {
+        color: #222;
+        background-color: #bbb;
+        border: 1px solid #999;
+        padding: 6px;
+        margin-right: 0;
+    }
+
+    #button-block div:hover {
+        opacity: .8;
+        cursor: pointer;
+    }
+</style>
+{% endblock style %}
+
+{% block body %}
+<h1 class="text-center" style="margin-top: 80px; margin-bottom: 40px;"> Friend Request Box</h1>
+{% if fr %}
+{% for i in fr %}
+<div id="fb" style="    margin-top: 10px; margin-left: 232px; width: 800px;">
+    <!-- <div id="fb-top">
+        <p><b>Friend Requests</b><span>Find Friends &bull; Settings</span></p>
+    </div> -->
+    <img src="{{ i.sender_img.dp.url }}" height="100" width="100" alt="Image of woman" style="    margin-top: -17px;
+    margin-left: 18px;">
+    <p style="    margin-left: 200px;
+    margin-top: 52px;
+    font-size: 29px;"><b>{{i.sender.username.username}}</b></p>
+    <p style="margin-left: 200px; font-size: 22px;"><b>{{i.sender.name}}</b></p>
+    <div id="button-block" style="display: flex; flex-direction: row;">
+        <form action="friend_request" method="post">
+            {% csrf_token %}
+            <input type="hidden"  value="{{ i.sender }}" name="send"> 
+            <input type="hidden"  value="{{ i.receiver }}" name="send1"> 
+            <button class="btn btn-primary profile-button" type="submit" style="margin-right: 10px;" id="btn"  >Accept</button>
+        </form>
+        <form action="request_decline" method="post">
+            {% csrf_token %}
+            <input type="hidden"  value="{{ i.sender }}" name="send"> 
+            <button class="btn btn-primary profile-button" type="submit" style="background-color: white; color: black;" id="btn"  >Decline</button>
+        </form>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+    <p style="    margin-left: 580px;
+    margin-top: 150px;
+    font-size: 25px;">No REquests</p>
+{% endif %}
+
+{% endblock body %}

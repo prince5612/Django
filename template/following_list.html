@@ -1,0 +1,39 @@
+{%extends 'base.html'%}
+{% block title %} Followers List {% endblock title %}
+
+{% block body %}
+
+<h4 class="mb-4" style="margin-top: 70px; margin-left: 40px;">Followings List</h4>
+{% for f in followings %}
+<div class="container mt-3" style="width: 96%;">
+
+    <div class="row">
+        <div class="col-12">
+            <a href="searched_user?login_info={{ f.following_user_pro.username.username }}"
+                style="text-decoration: none; color: black;">
+                <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                    <div class="d-flex align-items-center">
+                        {% if f.following_user_pro_img.dp %}
+                        <img src="{{ f.following_user_pro_img.dp.url }}" class="rounded-circle mr-3" alt="User"
+                            style="width: 50px; height: 50px;">
+                        {% else%}
+                        <img src="media/temp/user.png" class="rounded-circle mr-3" alt="User"
+                            style="width: 50px; height: 50px;">
+                        {% endif %}
+
+                        <div style="padding-left: 30px;">
+                            <h6 class="mb-0">{{ f.following_user_pro.username.username }}</h6>
+                            <!-- <small class="text-muted">Suggested for you</small> -->
+                        </div>
+                    </div>
+
+                    <!-- <button class="btn btn-primary btn-sm">Follow</button> -->
+                </div>
+            </a>
+            <!-- Repeat the above div block for more suggestions -->
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock body %}

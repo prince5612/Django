@@ -1,0 +1,124 @@
+{%extends 'base.html'%}
+{% block title %} Home {% endblock title %}
+{% block style %}
+<style>
+    .post {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .post .acc_info {
+        /* margin-left: -641px; */
+        margin-left: -380px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .post .share {
+        display: flex;
+        flex-direction: row;
+        margin-left: -395px;
+        /* margin-left: -620px; */
+    }
+
+    .post .share .tabs1 {
+        padding: 5px;
+    }
+</style>
+{% endblock style %}
+{% block body %}
+{% block nav %}
+<div class="container-fluid" style=" width: 600px;">
+    <form action="home" method="POST" class="d-flex">
+        {% csrf_token %}
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="username">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+</div>
+{% endblock nav %}
+{% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin-top: 40px;">
+                        <strong>{{ message }}</strong> 
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                    {% endif %}
+{% if posts %}
+{% for post , like in posts %}
+<div class="post " style=" margin-top: 56px;">
+    <a href="searched_user?login_info={{ post.user_pro.username.username }}"
+                style="text-decoration: none; color: black;">
+        <div class="acc_info">
+            {% if post.user_pro_img.dp %}
+            <img src="{{ post.user_pro_img.dp.url }}" alt="" width="50" height="50"
+                class="d-inline-block align-text-top" style="border-radius: 50%;">
+            {% else%}
+            <img src="media/temp/user.png" alt="" width="50" height="50" class="d-inline-block align-text-top" style="border-radius: 50%;">
+            {% endif %}
+            <strong style="font-size: 30px; padding-left: 10px; padding-bottom: 10px;">{{ post.user_pro.username.username }}</strong>
+        </div>
+    </a>
+    <img src="{{ post.post_img.url }}" alt="" style="width: 80vh; padding-top: 10px;">
+    <div class="share">
+        <a href="like_unlike?post_id={{ post.id }}"><div class="tabs1" style="margin-left: -54px;">
+            {% if like %}
+                {% if like.like %}
+                <img src="media/temp/heart.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+                {% else %}
+                <img src="media/temp/unliked.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+                {% endif %}
+            {% else %}
+                <img src="media/temp/unliked.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+            {% endif %}
+
+        </div></a>
+        <!-- <div class="tabs1">
+            <img src="media/temp/com.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+        </div> -->
+        <div class="tabs1">
+            <img src="media/temp/share2.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+        </div>
+
+    </div>
+</div>
+
+{% endfor %}
+{% else %}
+<h4 class="mb-4" style="margin-top: 50px; margin-left: 40px;">Suggested for You</h4>
+{% for profile, profile_img  in profile_img_list %}
+<div class="container mt-3" style="width: 96%;">
+
+    <div class="row">
+        <div class="col-12">
+            <a href="searched_user?login_info={{ profile.username.username }}"
+                style="text-decoration: none; color: black;">
+                <div class="d-flex align-items-center justify-content-between border rounded p-3 mb-3">
+                    <div class="d-flex align-items-center">
+                        {% if profile_img.dp %}
+                        <img src="{{ profile_img.dp.url }}" class="rounded-circle mr-3" alt="User"
+                            style="width: 50px; height: 50px;">
+                        {% else%}
+                        <img src="media/temp/user.png" class="rounded-circle mr-3" alt="User"
+                            style="width: 50px; height: 50px;">
+                        {% endif %}
+
+                        <div style="padding-left: 30px;">
+                            <h6 class="mb-0">{{ profile.username.username }}</h6>
+                            <small class="text-muted">Suggested for you</small>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm">Follow</button>
+                </div>
+            </a>
+            <!-- Repeat the above div block for more suggestions -->
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+<div style="margin-bottom: 80px;"></div>
+{% endblock body %}

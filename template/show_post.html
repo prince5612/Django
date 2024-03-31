@@ -1,0 +1,82 @@
+{%extends 'base.html'%}
+{% block title %} Home {% endblock title %}
+{% block style %}
+<style>
+    .post {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .post .acc_info {
+        /* margin-left: -641px; */
+        margin-left: -340px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .post .share {
+        display: flex;
+        flex-direction: row;
+        margin-left: -395px;
+        /* margin-left: -620px; */
+    }
+
+    .post .share .tabs1 {
+        padding: 5px;
+    }
+</style>
+{% endblock style %}
+{% block body %}
+<h1 style="margin-top: 75px;  background-color: #f8f9fa!important; width: 97%; text-align: center;">Post</h1>
+<div class="post" style=" margin-top: 40px;  margin-bottom: 80px;">
+    <A href="searched_user?login_info={{login.username}}" style="color: black; text-decoration: none;">
+        <div class="acc_info">
+            {% if img.dp %}
+            <img src="{{ img.dp.url }}" alt="" width="50" height="50" class="rounded  d-inline-block align-text-top">
+            {% else %}
+            <img src="media/temp/user.png" alt="" width="50" height="50" class="rounded  d-inline-block align-text-top">
+            {% endif %}
+            <strong style="font-size: 30px; padding-left: 10px;">{{ login.username }}</strong>
+        </div>
+    </A>
+    <img src="{{ post.post_img.url }}" alt="" style="width: 80vh; padding-top: 10px;">
+    {% if post.caption %}
+    <div style="font-size: 25px;
+    margin-left: -253px;">
+        <b>Caption: </b>{{post.captions}}
+    </div>
+    {% endif %}
+    <div class="share">
+        <a href="like_unlike?post_id={{ post.id }}&page=post" style="text-decoration: none ; color: black;"><div class="tabs1">
+            {% if like %}
+                {% if like.like %}
+                <img src="media/temp/heart.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+                {% else %}
+                <img src="media/temp/unliked.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+                {% endif %}
+            {% else %}
+                <img src="media/temp/unliked.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+            {% endif %}
+            <p style="margin-left: 20px;">{{ post.like_cnt }}</p>
+        </div></a>
+        <!-- <div class="tabs1">
+            <img src="media/temp/com.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+        </div> -->
+        {% if d %}
+        <div class="tabs1">
+            <a href="delete_post?id=
+            {{post.id}}">
+            <img src="media/temp/delete.png" alt="" width="50" height="50" class="d-inline-block align-text-top"></a>
+        </div>
+        {% endif %}
+        <!-- <div class="tabs2">
+            <img src="media/temp/close.png" alt="" width="50" height="50" class="d-inline-block align-text-top">
+        </div> -->
+
+    </div>
+</div>
+
+{% endblock body %}

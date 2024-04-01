@@ -73,17 +73,22 @@ def home(request):
             if User_profile.objects.filter(username=Login_info.objects.get(username=username)).exists():
             # print('hello')
                 user1=request.session['username']
+                # current logged in user
                 user1_login=Login_info.objects.get(username=user1) 
                 user1_pro=User_profile.objects.get(username=user1_login)
+                #searched user
                 login_info = Login_info.objects.get(username=username)  
                 user_pro=User_profile.objects.get(username=login_info)
                 user_pro_img=User_profile_img.objects.get(username=login_info)
+                # all following of current user
                 following = Following.objects.all().filter(username = user1_login)
 
                 for f in following:
+                    # check for searched user is in following or not
                     if f.following_user_pro == User_profile.objects.get(username = login_info):
                         post= Post1.objects.all().filter(user_pro = User_profile.objects.get(username = login_info))
                         cnt=User_count.objects.get(username=login_info)
+                        # show posts and unfollow button
                         context={
                         'info' : User_profile.objects.get(username=login_info),
                         'img' : User_profile_img.objects.get(username=login_info),
@@ -93,12 +98,14 @@ def home(request):
                         'cnt' : cnt,
                         }
                         return render(request,"searched_user.html" , context)
-
+                    
+                # check for friend request is already sent or not
                 if Friend_requests.objects.filter(sender= user1_pro).exists():
                     fr = Friend_requests.objects.all().filter(sender=user1_pro)
                     for f in fr:
                         if f.receiver==login_info:
                             cnt=User_count.objects.get(username=login_info)
+                            # show requested btn
                             context={
                                 'info': user_pro,
                                 'img': user_pro_img,
@@ -106,6 +113,7 @@ def home(request):
                                 'cnt' : cnt,
                             }
                         else:
+                            # show follow btn
                             cnt=User_count.objects.get(username=login_info)
                             context={
                                 'info': user_pro,
@@ -113,11 +121,12 @@ def home(request):
                                 'cnt' : cnt,
                             }
                 else:
+                    # Show follow btn Frd req not sent
                     cnt=User_count.objects.get(username=login_info)
                     context={
                         'info': user_pro,
                         'img': user_pro_img,
-                    'cnt' : cnt,
+                        'cnt' : cnt,
                     }
                 return render(request,"searched_user.html" , context)
             else:
@@ -125,10 +134,14 @@ def home(request):
         else:
             messages.info(request, "Username not Found")
         
+    # home page logic
     post_list=[]
     session_username = request.session['username']
     login_info = Login_info.objects.get(username=session_username)  
+    #find all following of current user
     fol = Following.objects.all().filter(username=login_info)
+
+    # for all following user add post and like status of current user in list
     for f in fol:
         posts = Post1.objects.all().filter(user_pro=f.following_user_pro)
         for p in posts:
@@ -140,6 +153,8 @@ def home(request):
                 post_list.append((p,like))
     random.shuffle(post_list)
     # print(post_list)
+
+    # suggetion account if not any following account
     profiles = User_profile.objects.exclude(username=login_info)
     profile_img_list = []
     for profile in profiles:
@@ -170,10 +185,8 @@ def create_profile(request):
             cnt.username=login_info
             cnt.save()
             return redirect("/home")
-        
-    obj = User_profile.objects.filter(username=login_info)
-    context = {'obj': obj}
-    return render(request, "profile.html" , context)
+    
+    return render(request, "profile.html")
 
 
 def upload_photo(request):
@@ -181,6 +194,7 @@ def upload_photo(request):
         session_username = request.session['username']
         login_info = Login_info.objects.get(username=session_username)  
         if User_profile_img.objects.filter(username=login_info).exists():
+            #if user_profile_img is already exist then delete that obj and create new obj
             ins=User_profile_img.objects.filter(username=login_info)
             ins.delete()
             obj = User_profile_img(username=login_info, dp=request.FILES['imp'])
@@ -188,7 +202,9 @@ def upload_photo(request):
             context={'obj':obj}
             return render(request, "profile.html", context)
         else:
+            #if user_profile_img is not exist thencreate new obj
             ins = User_profile_img(username=login_info, dp=request.FILES['imp'])
+            # imp -> field name in html form
             ins.save()
             context = {'obj': ins}
             return render(request, "profile.html", context)
@@ -275,8 +291,9 @@ def post_create(request):
         return redirect("/show_profile")
     return render(request , "post_create.html")
 
+# for showing searched user profile
 def searched_user(request):
-
+    # calling Searched user from get method
     if request.method=="GET":
         # print("in get")
         username=request.GET.get('login_info')
@@ -284,13 +301,16 @@ def searched_user(request):
         login_info=Login_info.objects.get(username=username)
         session_username = request.session['username']
         ses_login=Login_info.objects.get(username=session_username)
+        # if user is logged in user 
         if username==session_username:
             return redirect("show_profile")
+        #get all foll of cur user
         fol=Following.objects.all().filter(username=ses_login)
         if fol :
             for f in fol:
+                # check for searched user is in following or not
                 if f.following_user_pro==User_profile.objects.get(username=login_info):
-                
+                    #show all posts of user and unfollow btn
                     context={
                         'info' : User_profile.objects.get(username=login_info),
                         'img' : User_profile_img.objects.get(username=login_info),
@@ -299,6 +319,7 @@ def searched_user(request):
                         'f' : f,
                     }
                 else:
+                    #just show name user profile img and follow btn
                     context={
                         'info' : User_profile.objects.get(username=login_info),
                         'img' : User_profile_img.objects.get(username=login_info),
@@ -311,16 +332,19 @@ def searched_user(request):
                         'cnt' : User_count.objects.get(username=login_info) , 
                     }
 
+    # logic of sending  frd request
     if request.method=="POST":
+        #searched user
         receiver = request.session['receiver']
-        # print(receiver)
+        # curr user
         session_username = request.session['username']
         login_info = Login_info.objects.get(username=session_username)  
         user_pro=User_profile.objects.get(username=login_info)
         user_pro_img=User_profile_img.objects.get(username=login_info)
         rec=Login_info.objects.get(username=receiver)
         ins = Friend_requests()
-        ins.receiver=rec
+        ins.receiver=rec # searched user login_info
+        # current user data
         ins.sender=user_pro
         ins.sender_img=user_pro_img
         ins.save()
@@ -335,16 +359,18 @@ def searched_user(request):
 
 def delete_post(request):
     if request.method == "GET":
-        print("hello")
+        # print("hello")
         id = request.GET.get('id')
         post = Post1.objects.get(id=id)
         post.delete()
         session_username = request.session['username']
         login_info = Login_info.objects.get(username=session_username)
         cnt = User_count.objects.get(username = login_info)
+        # reduce the post_cnt by 1
         User_count.objects.filter(username=login_info).update(post_cnt=cnt.post_cnt-1)
     return redirect("show_profile")
 
+# for showing the frd_req page
 def friend_request(request):
     session_username = request.session['username']
     login_info = Login_info.objects.get(username=session_username)
@@ -353,18 +379,26 @@ def friend_request(request):
     context = {
         'fr' : fr,
     }
+
+    # for follow
     if request.method == "POST":
+        # info of sender
         send=request.POST.get('send')
         sender_pro = User_profile.objects.get(name=send)
         sender_pro_img=User_profile_img.objects.get(username=sender_pro.username)
+        #all frd_req of curr logged in user
         fr1 = Friend_requests.objects.all().filter(receiver = login_info)
+        #info of current user
         receiver_pro = User_profile.objects.get(username = login_info)
         receiver_pro_img = User_profile_img.objects.get(username=receiver_pro.username)
         
         for i in fr1:
             # print(i)
+            # find the request with our sender
             if i.sender == sender_pro:
+                #delete frd_req object
                 i.delete()
+                # create follower object of current user and increment the follower cnt 
                 ins= Followers()
                 ins.username=login_info
                 ins.followed_user_pro=sender_pro
@@ -372,6 +406,8 @@ def friend_request(request):
                 ins.save()
                 cnt = User_count.objects.get(username=login_info)
                 User_count.objects.filter(username=login_info).update(follower_cnt=cnt.follower_cnt+1)
+
+                # create following object of sender user and inc following cnt
                 ins1 = Following()
                 ins1.username = sender_pro.username
                 ins1.following_user_pro = receiver_pro
@@ -394,10 +430,11 @@ def request_decline(request):
         if request.method == "POST":
             send=request.POST.get('send')
             sender_pro = User_profile.objects.get(name=send)
-            print(sender_pro)
+            # print(sender_pro)
             sender_pro_img=User_profile_img.objects.get(username=sender_pro.username)
             fr1 = Friend_requests.objects.all().filter(receiver = login_info)
             for i in fr1:
+                #find the req with correct  sender and delete it
                 if i.sender == sender_pro:
                     i.delete()
                     return render(request , "friend_request.html",context)
@@ -406,17 +443,21 @@ def request_decline(request):
 
 def unfollow(request):
     if request.method == "POST":
+        # info of curr user
         session_username = request.session['username']
         login_info = Login_info.objects.get(username=session_username)
+        # info of searched user
         rec_user = request.session['receiver']
         rec_login = Login_info.objects.get(username=rec_user)
         following = Following.objects.all().filter(username = login_info)
+        # delete the following object of current use and dec the following cnt
         for f in following:
             if f.following_user_pro==User_profile.objects.get(username = rec_login):
                 f.delete()
                 cnt = User_count.objects.get(username=login_info)
                 User_count.objects.filter(username=login_info).update(following_cnt=cnt.following_cnt-1)
         follower =Followers.objects.all().filter(username = rec_login)
+        # delete the follower object of searched user and dec follower cnt
         for f in follower:
             if f.followed_user_pro==User_profile.objects.get(username=login_info):
                 f.delete()
@@ -438,10 +479,12 @@ def show_post(request):
         p=Post1.objects.get(id=p_id)
         login_info = Login_info.objects.get(username=p.user_pro.username.username)
         user_pro_img=User_profile_img.objects.get(username=login_info)
+        # check the like status of cur user with this post
         if Like.objects.filter(username=Login_info.objects.get(username=session_username)).filter(post=p).exists():
             like=Like.objects.filter(username=Login_info.objects.get(username=session_username)).get(post=p)
         else:
             like=Like()
+        # if post is of curr user show delete post btn
         if session_username==p.user_pro.username.username:
             context = {
                 'post' : p,
@@ -466,14 +509,18 @@ def like_unlike(request):
         post=Post1.objects.get(id=post_id)
         session_username = request.session['username']
         login_info = Login_info.objects.get(username=session_username)
+        # check for like obj is exists or not
         if Like.objects.filter(username=login_info).filter(post=post).exists():
             like=Like.objects.filter(username=login_info).get(post=post)
+            # if like status is false then make it true and inc post like cnt
             if like.like==False:
                 Post1.objects.filter(id=post_id).update(like_cnt=post.like_cnt+1)
                 Like.objects.filter(username=login_info).filter(post=post).update(like=True)
+            #Else make like status false and dec post like cnt
             else:
                 Post1.objects.filter(id=post_id).update(like_cnt=post.like_cnt-1)
                 Like.objects.filter(username=login_info).filter(post=post).update(like=False)
+        # first time like by user on this post
         else:
             ins=Like()
             ins.username=login_info
@@ -481,6 +528,7 @@ def like_unlike(request):
             ins.like=True
             ins.save()
             Post1.objects.filter(id=post_id).update(like_cnt=post.like_cnt+1)
+        # if function is called from show post page after like redirect to show post page
         if request.GET.get('page')=="post":
             return redirect(f'/show_post?post={post_id}')
     return redirect("home")
